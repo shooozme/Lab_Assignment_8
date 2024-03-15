@@ -29,12 +29,51 @@ size_t Size(void* ptr)
 
 // implement merge sort
 // extraMemoryAllocated counts bytes of extra memory allocated
-void mergeSort(int pData[], int l, int r)
-{
+void merge(int values[], int leftIndex, int middleIndex, int rightIndex) {
+
+	int *temp, i, length, count1, count2, mc;
+  
+    length = rightIndex - leftIndex + 1;
+    temp = (int*)Alloc(length * sizeof(int));
+
+    count1 = leftIndex;
+    count2 = middleIndex;
+    mc = 0;
+
+    while ((count1 < middleIndex) || (count2 <= rightIndex)) {
+		if (count2 > rightIndex || (count1 < middleIndex && values[count1] < values[count2])) {
+            temp[mc] = values[count1];
+            count1++;
+            mc++;
+        }
+    	else {
+            temp[mc] = values[count2];
+            count2++;
+            mc++;
+        }
+    }
+
+    for (i=leftIndex; i<=rightIndex; i++) {
+		values[i] = temp[i - leftIndex];
+	}
+
+	DeAlloc(temp);
+}
+
+void mergeSort(int pData[], int leftIndex, int rightIndex) {
+	int midIndex;
+
+    if (leftIndex < rightIndex) {
+        midIndex = (leftIndex + rightIndex) / 2;
+    
+        mergeSort(pData, leftIndex, midIndex);
+        mergeSort(pData, midIndex + 1, rightIndex);
+        merge(pData, leftIndex, midIndex + 1, rightIndex);
+    }
 }
 
 // parses input file to an integer array
-int parseData(char *inputFileName, int **ppData)
+int parseData(char *inputFileName, int **ppData) 
 {
 	FILE* inFile = fopen(inputFileName,"r");
 	int dataSz = 0;
@@ -88,7 +127,7 @@ int main(void)
 	clock_t start, end;
 	int i;
     double cpu_time_used;
-	char* fileNames[] = { "input1.txt", "input2.txt", "input3.txt", "input4.txt" };
+	char* fileNames[] = { "input1.txt", "input2.txt", "input3.txt", "input4.txt"};
 	
 	for (i=0;i<4;++i)
 	{
